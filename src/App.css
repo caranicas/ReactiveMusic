@@ -1,0 +1,37 @@
+/* RESET */
+p {
+  margin: 0;
+}
+
+
+/*MAIN PAGE */
+
+#layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: calc(10px + 2vmin);
+}
+
+#header {
+  background-color:lightgrey;
+  width: 100%;
+  flex-basis: 50px;
+  display: flex;
+  justify-content: space-around;
+}
+
+#content {
+  background-color: whitesmoke;
+  flex-grow: 2;
+  width: 100%;
+  display: flex;
+}
+
+#footer {
+  background-color:darkgrey;
+  width: 100%;
+  flex-basis: 50px;
+}
+
