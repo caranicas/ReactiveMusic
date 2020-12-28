@@ -3,19 +3,26 @@ import {  useCallback, useRef } from 'react';
 import {  useSelector, useDispatch } from 'react-redux';
 
 
-import { Canvas } from 'react-three-fiber';
+import { Canvas, useThree} from 'react-three-fiber';
 
 
 import {Raycaster, Vector3, Vector2 } from 'three';
 
 import { Box, dreiBox } from '../../primatives/Box';
 
+import { Sphere } from '../../primatives/Sphere';
+
 import CustomCamera from './CustomCamera';
 import EditControls from './controls/editControls';
 import InfoControls from './controls/infoControls';
 
 import styles from './audioDemo.module.css';
-import { addBoxToScene, selectDemoShapes, selectCurrentPerspective } from './audioDemoSlice';
+
+import { 
+    INSPECT, MAKE_SQUARE, MAKE_CIRCLE,
+    addBoxToScene, addSphereToScene,
+    selectCubes, selectSpheres, selectCurrentAction 
+} from './audioDemoSlice';
 
 function BoxList (props) {
     const { boxes } = props;
@@ -29,6 +36,17 @@ function BoxList (props) {
     })
 };
 
+
+function SphereList (props) {
+    const { spheres } = props;
+    return spheres.map((sphere) => {
+        //console.log('sphere', sphere);
+        return (
+            <Sphere key={sphere.id} position={sphere.position} />
+        );
+        /**            <dreiBox></dreiBox> */
+    })
+};
 
 
 // function screenToWorld(_screenPos)
@@ -48,14 +66,14 @@ export default function AudioDemo () {
 
     const dispatch = useDispatch();
 
-    const boxes = useSelector(selectDemoShapes);
-
-    const perspective = useSelector(selectCurrentPerspective);
+    const boxes = useSelector(selectCubes);
+    const spheres = useSelector(selectSpheres);
+    const action = useSelector(selectCurrentAction);
 
     const cameraRef = useRef();
 
     const raycaster = new Raycaster();
-    const dropShape = useCallback(
+    const clickCanvas = useCallback(
         (e) => {
             const { 
             nativeEvent: {
@@ -69,32 +87,76 @@ export default function AudioDemo () {
                 clientWidth,
                 clientHeight,
             }} = e;
+            //const { scene } = useThree();
 
-            // good enough for now.
-            const mouse = new Vector3();
-            mouse.x = ( offsetX/ clientWidth ) * 2 - 1;
-            mouse.y = - ( offsetY / clientHeight ) * 2 + 1;
-            mouse.z = -1;
-            raycaster.setFromCamera( mouse, cameraRef.current );
-            let {ray: {direction, direction: {x,y,z}}} = raycaster;
-            // not sure why i need to multiply it by this... 
-            x *= camDepth;
-            y *= camDepth;
-            const pos = {x, y, z:0};
-            return dispatch(addBoxToScene({pos}))
+            const ShapeInspect = () => {
+                console.log('she can inspect me...')
+                const mouse = new Vector3();
+                mouse.x = ( offsetX/ clientWidth ) * 2 - 1;
+                mouse.y = - ( offsetY / clientHeight ) * 2 + 1;
+                mouse.z = -1;
+                raycaster.setFromCamera( mouse, cameraRef.current );
+    
+                //const intersects = raycaster.intersectObjects( scene.children );
+            }
+
+            const addBox = () => { 
+                // good enough for now.
+                // this needs to work regardless of FOV and camera depth
+                const mouse = new Vector3();
+                mouse.x = ( offsetX/ clientWidth ) * 2 - 1;
+                mouse.y = - ( offsetY / clientHeight ) * 2 + 1;
+                mouse.z = -1;
+                raycaster.setFromCamera( mouse, cameraRef.current );
+                let {ray: {direction, direction: {x,y,z}}} = raycaster;
+                // not sure why i need to multiply it by this... 
+                x *= camDepth;
+                y *= camDepth;
+                const pos = {x, y, z:0};
+                return dispatch(addBoxToScene({pos}))
+            };
+
+            const addSphere = () => { 
+                // dry this up with above
+                // good enough for now.
+                // this needs to work regardless of FOV and camera depth
+                const mouse = new Vector3();
+                mouse.x = ( offsetX/ clientWidth ) * 2 - 1;
+                mouse.y = - ( offsetY / clientHeight ) * 2 + 1;
+                mouse.z = -1;
+                raycaster.setFromCamera( mouse, cameraRef.current );
+                let {ray: {direction, direction: {x,y,z}}} = raycaster;
+                // not sure why i need to multiply it by this... 
+                x *= camDepth;
+                y *= camDepth;
+                const pos = {x, y, z:0};
+                return dispatch(addSphereToScene({pos}))
+            }
+
+            if(action == INSPECT) {
+                return ShapeInspect();
+            }
+            else if(action == MAKE_SQUARE) {
+                return addBox();
+            }
+            else if(action == MAKE_CIRCLE) {
+                return addSphere();
+            }
 
         },
-        [dispatch]
+        [dispatch, action]
     );
 
+    //         <BoxList boxes={boxes} ></BoxList>
     return (
         <>
             <div className={styles.canvasContainer}>
-                <Canvas style={{ position: 'absolute', top:'0' }} onClick={dropShape}>
+                <Canvas style={{ position: 'absolute', top:'0' }} onClick={clickCanvas}>
                     <CustomCamera ref={cameraRef} fov={30} position={[0, 0, camDepth]} />
                     <ambientLight />
                     <pointLight position={[10, 10, 10]} />
                     <BoxList boxes={boxes} ></BoxList>
+                    <SphereList spheres={spheres} ></SphereList>
                 </Canvas>
             </div>
             <EditControls></EditControls>
