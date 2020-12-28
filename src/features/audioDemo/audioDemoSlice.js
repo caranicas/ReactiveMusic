@@ -10,12 +10,13 @@ const CUBE = 'CUBE';
 const SPHERE = 'SPHERE';
 
 // doing this on the cheap
-let shapeId = 0; 
+let shapeId = -1; 
 const BoxRecord = (pos) => {
     const {x, y, z} = pos;
     return {
         position:[x, y, z],
         id: ++shapeId,
+        active:false,
         type:CUBE
     };
 };
@@ -25,6 +26,7 @@ const ShpereRecord = (pos) => {
   return {
       position:[x, y, z],
       id: ++shapeId,
+      active:false,
       type:SPHERE
   };
 };
@@ -42,6 +44,14 @@ export const audioDemoSlice = createSlice({
       state.action = action.payload;
     },
 
+    setShapeIndexActive: (state, action) => {
+      const { payload } = action;
+      // todo make this more effiecent.
+      state.shapes.forEach(shape => shape.active = false);
+      const updateShape = state.shapes.filter(shape => shape.id === payload)[0];
+      updateShape.active = true;
+    },
+
     addBoxToScene: (state, action) => {
         const {payload: { pos }} = action;
         // todo set these to keys
@@ -54,11 +64,11 @@ export const audioDemoSlice = createSlice({
       // todo set these to keys
       const record = ShpereRecord(pos);
       state.shapes.push(record);
-  }
+    }
   },
 });
 
-export const { setEditAction, addBoxToScene, addSphereToScene } = audioDemoSlice.actions;
+export const { setEditAction, addBoxToScene, addSphereToScene, setShapeIndexActive } = audioDemoSlice.actions;
 
 export const selectAudioDemoDomain = state => state.audioDemo;
 
@@ -77,6 +87,11 @@ export const selectDemoShapes = createSelector(
     audioDemo => audioDemo.shapes
 );
 
+export const selectActiveShapeId = createSelector(
+  selectDemoShapes,
+  shapes => shapes.filter(shape => shape.active)[0]?.id
+);
+
 export const selectCubes = createSelector(
   selectDemoShapes,
   shapes => shapes.filter(shape => shape.type == CUBE)
@@ -92,10 +107,5 @@ export const makeSelectShapeByIndexSelector = (index) => createSelector(
   (shapes) => shapes[index]
 );
 
-
-// export const selectCurentShape = (index) => createSelector(
-//   selectAudioDemoDomain,
-//   audioDemo => audioDemo.shapes.filter(shape => shape.selected)
-// );
 
 export default audioDemoSlice.reducer;

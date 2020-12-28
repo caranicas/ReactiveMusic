@@ -6,19 +6,28 @@ import { Button } from '@material-ui/core';
 import {ToggleButtonGroup, ToggleButton} from '@material-ui/lab'
 import { 
     INSPECT, MAKE_SQUARE, MAKE_CIRCLE,
-    addBoxToScene, addSphereToScene, setEditAction,
-    selectCurrentAction
+    addBoxToScene, addSphereToScene, setEditAction, setShapeIndexActive,
+   selectActiveShapeId,  selectCurrentAction
 } from '../audioDemoSlice';
 
 export default function EditControls () {
 
     const dispatch = useDispatch();
     const buttonValue = useSelector(selectCurrentAction);
+    const idValu = useSelector(selectActiveShapeId);
+
+
+    const updateSelectedIndex = useCallback(
+        () => {
+            return dispatch(setShapeIndexActive(0));
+        },
+        [dispatch]
+    );
 
     const createBox = useCallback(
         () => {
             const pos = {x:0,y:0,z:0};
-            return dispatch(addBoxToScene({pos}))
+            return dispatch(addBoxToScene({pos}));
         },
         [dispatch]
     );
@@ -26,7 +35,7 @@ export default function EditControls () {
     const createSphere = useCallback(
         () => {
             const pos = {x:0,y:0,z:0};
-            return dispatch(addSphereToScene({pos}))
+            return dispatch(addSphereToScene({pos}));
         },
         [dispatch]
     );
@@ -38,7 +47,7 @@ export default function EditControls () {
     return (
         <div style={{ display:'flex', padding: '5px', backgroundColor:'rgb(200,200,200)' }}>
             <ToggleButtonGroup value={buttonValue} onChange={handleEditAction}  exclusive aria-label="text formatting">
-                <ToggleButton value={INSPECT}> Inspect </ToggleButton> 
+                <ToggleButton value={INSPECT}  onDoubleClick={updateSelectedIndex}> Inspect </ToggleButton> 
                 <ToggleButton value={MAKE_SQUARE} onDoubleClick={createBox}>Add Cube</ToggleButton> 
                 <ToggleButton value={MAKE_CIRCLE} onDoubleClick={createSphere} color="primary">Add sphere</ToggleButton> 
             </ToggleButtonGroup>
