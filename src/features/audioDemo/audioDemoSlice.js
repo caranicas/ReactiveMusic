@@ -10,12 +10,13 @@ const CUBE = 'CUBE';
 const SPHERE = 'SPHERE';
 
 // doing this on the cheap
-let shapeId = 0; 
+let shapeId = -1; 
 const BoxRecord = (pos) => {
     const {x, y, z} = pos;
     return {
         position:[x, y, z],
         id: ++shapeId,
+        selected:false,
         type:CUBE
     };
 };
@@ -25,6 +26,7 @@ const ShpereRecord = (pos) => {
   return {
       position:[x, y, z],
       id: ++shapeId,
+      selected:false,
       type:SPHERE
   };
 };
@@ -38,8 +40,18 @@ export const audioDemoSlice = createSlice({
     lights:[]
   },
   reducers: {
+
     setEditAction:  (state, action) => {
       state.action = action.payload;
+    },
+
+    setShapeIndexActive: (state, action) => {
+      const { payload } = action;
+      // todo make this more effiecent.
+      state.shapes.forEach(shape => shape.selected = false);
+      const active = state.shapes.filter(shape => shape.id === payload);
+      debugger;
+      active[0].selected = true;
     },
 
     addBoxToScene: (state, action) => {
@@ -58,7 +70,7 @@ export const audioDemoSlice = createSlice({
   },
 });
 
-export const { setEditAction, addBoxToScene, addSphereToScene } = audioDemoSlice.actions;
+export const { setEditAction, addBoxToScene, addSphereToScene, setShapeIndexActive } = audioDemoSlice.actions;
 
 export const selectAudioDemoDomain = state => state.audioDemo;
 
@@ -87,11 +99,24 @@ export const selectSpheres = createSelector(
   shapes => shapes.filter(shape => shape.type == SPHERE)
 );
 
+
+export const selectActiveShapeId = createSelector(
+  selectDemoShapes,
+  shapes => shapes.filter(shape => shape.selected)[0].id
+);
+
+
+
+
 export const makeSelectShapeByIndexSelector = (index) => createSelector(
   selectDemoShapes,
   (shapes) => shapes[index]
 );
 
+export const makeIsShapeActiveSelector = (index) => createSelector(
+  selectDemoShapes,
+  (shapes) => shapes[index].selected === true
+);
 
 // export const selectCurentShape = (index) => createSelector(
 //   selectAudioDemoDomain,

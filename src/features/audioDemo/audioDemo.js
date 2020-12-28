@@ -2,15 +2,15 @@ import {  useCallback, useRef } from 'react';
 
 import {  useSelector, useDispatch } from 'react-redux';
 
-
 import { Canvas, useThree} from 'react-three-fiber';
-
 
 import {Raycaster, Vector3, Vector2 } from 'three';
 
 import { Box, dreiBox } from '../../primatives/Box';
 
 import { Sphere } from '../../primatives/Sphere';
+
+import { useContextBridge } from '@react-three/drei';
 
 import CustomCamera from './CustomCamera';
 import EditControls from './controls/editControls';
@@ -21,58 +21,52 @@ import styles from './audioDemo.module.css';
 import { 
     INSPECT, MAKE_SQUARE, MAKE_CIRCLE,
     addBoxToScene, addSphereToScene,
-    selectCubes, selectSpheres, selectCurrentAction 
+    selectCubes, selectSpheres, selectCurrentAction, setShapeIndexActive, selectActiveShapeId,
+    makeIsShapeActiveSelector
 } from './audioDemoSlice';
+
+
+import {
+    shapeContext
+} from './context';
 
 function BoxList (props) {
     const { boxes } = props;
 
+    const activeID = 0; //useSelector(selectActiveShapeId);
     return boxes.map((box) => {
-        //console.log('box', box);
+        const isActive = true;//= activeID === box.id;
         return (
-            <Box key={box.id} position={box.position} />
+            <Box key={box.id} id={box.id} active={isActive} position={box.position} />
         );
         /**            <dreiBox></dreiBox> */
     })
 };
-
 
 function SphereList (props) {
     const { spheres } = props;
     return spheres.map((sphere) => {
-        //console.log('sphere', sphere);
         return (
-            <Sphere key={sphere.id} position={sphere.position} />
+            <Sphere key={sphere.id} id={sphere.id}  position={sphere.position} />
         );
-        /**            <dreiBox></dreiBox> */
     })
 };
 
 
-// function screenToWorld(_screenPos)
-// {
-//     var worldPos = _screenPos.clone();
-//     worldPos.x = worldPos.x / windowHalfX - 1;
-//     worldPos.y = - worldPos.y / windowHalfY + 1;
-//     projector.unprojectVector( worldPos, camera );
-//     return worldPos;                    
-// }
 
 
-
-export default function AudioDemo () {
+function AudioDemoScene () {
 
     const camDepth = 10;
 
     const dispatch = useDispatch();
-
     const boxes = useSelector(selectCubes);
     const spheres = useSelector(selectSpheres);
     const action = useSelector(selectCurrentAction);
 
     const cameraRef = useRef();
-
     const raycaster = new Raycaster();
+    
     const clickCanvas = useCallback(
         (e) => {
             const { 
@@ -87,18 +81,17 @@ export default function AudioDemo () {
                 clientWidth,
                 clientHeight,
             }} = e;
-            //const { scene } = useThree();
 
-            const ShapeInspect = () => {
-                console.log('she can inspect me...')
-                const mouse = new Vector3();
-                mouse.x = ( offsetX/ clientWidth ) * 2 - 1;
-                mouse.y = - ( offsetY / clientHeight ) * 2 + 1;
-                mouse.z = -1;
-                raycaster.setFromCamera( mouse, cameraRef.current );
+            // const ShapeInspect = () => {
+            //     console.log('she can inspect me...')
+            //     const mouse = new Vector3();
+            //     mouse.x = ( offsetX/ clientWidth ) * 2 - 1;
+            //     mouse.y = - ( offsetY / clientHeight ) * 2 + 1;
+            //     mouse.z = -1;
+            //     raycaster.setFromCamera( mouse, cameraRef.current );
     
-                //const intersects = raycaster.intersectObjects( scene.children );
-            }
+            //     //const intersects = raycaster.intersectObjects( scene.children );
+            // }
 
             const addBox = () => { 
                 // good enough for now.
@@ -133,10 +126,11 @@ export default function AudioDemo () {
                 return dispatch(addSphereToScene({pos}))
             }
 
-            if(action == INSPECT) {
-                return ShapeInspect();
-            }
-            else if(action == MAKE_SQUARE) {
+            // if(action == INSPECT) {
+            //     return ShapeInspect();
+            // }
+
+            if(action == MAKE_SQUARE) {
                 return addBox();
             }
             else if(action == MAKE_CIRCLE) {
@@ -147,15 +141,18 @@ export default function AudioDemo () {
         [dispatch, action]
     );
 
-    //         <BoxList boxes={boxes} ></BoxList>
+    const ContextBridge = useContextBridge(shapeContext);
+
     return (
         <>
             <div className={styles.canvasContainer}>
-                <Canvas style={{ position: 'absolute', top:'0' }} onClick={clickCanvas}>
+                <Canvas style={{ position: 'absolute', top:'0' }}>
                     <CustomCamera ref={cameraRef} fov={30} position={[0, 0, camDepth]} />
                     <ambientLight />
                     <pointLight position={[10, 10, 10]} />
-                    <BoxList boxes={boxes} ></BoxList>
+                    {/* <ContextBridge> */}
+                        <BoxList boxes={boxes} ></BoxList>
+                    {/* </ContextBridge> */}
                     <SphereList spheres={spheres} ></SphereList>
                 </Canvas>
             </div>
@@ -164,3 +161,18 @@ export default function AudioDemo () {
         </>
     );
 };
+
+
+        // <shapeContext.Provider value={{dispatch, setShapeIndexActive}}>
+         // </shapeContext.Provider>
+export default function AudioDemo() {
+    //const dispatch = useDispatch();
+    return (
+        <AudioDemoScene></AudioDemoScene>
+    );
+         //   <AudioDemoScene></AudioDemoScene>
+       
+};
+
+
+
