@@ -13,7 +13,8 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  Redirect
 } from "react-router-dom";
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         url += `&redirect_uri=${encodeURIComponent(redirect_uri)}`;
         url += `&scope=${encodeURIComponent(scopes.join(' '))}`;
 
+        window.location = url;
         console.log('doLogin',url);
        // dispatch({});
     },
@@ -66,7 +68,11 @@ function App() {
             </div>
             <div id="content">
                 <Switch>
-                  
+
+                  <Route exact path="/">
+                    <Button  onClick={doLogin}>LOGIN</Button>
+                  </Route>
+
                   <Route exact path="/editor">
                     { EditorPage }
                   </Route>
@@ -77,13 +83,14 @@ function App() {
 
                   <Route path="/callback">
                     <CallbackPage />
+                    <Redirect to="/editor" />
                   </Route>
+
 
                 </Switch>
             </div>
 
             <div id="footer">
-              <Button  onClick={doLogin}>LOGIN</Button>
               <p>Footer Lorem ipsum</p>
             </div>
         </div>

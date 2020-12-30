@@ -37,7 +37,10 @@ export const audioDemoSlice = createSlice({
     perspective: 'X',
     action: INSPECT,
     shapes:[],
-    lights:[]
+    lights:[],
+    spotify:{
+      //token, type, expire
+    }
   },
   reducers: {
     setEditAction:  (state, action) => {
@@ -64,11 +67,22 @@ export const audioDemoSlice = createSlice({
       // todo set these to keys
       const record = ShpereRecord(pos);
       state.shapes.push(record);
+    },
+
+    setSpofityTokenInfo: (state, action) => {
+      console.log(
+        'spotify info', action
+      )
+      const{payload: {token, type, expire}} = action
+
+      state.spotify = {
+        token, type, expire
+      }
     }
   },
 });
 
-export const { setEditAction, addBoxToScene, addSphereToScene, setShapeIndexActive } = audioDemoSlice.actions;
+export const { setEditAction, addBoxToScene, addSphereToScene, setShapeIndexActive, setSpofityTokenInfo } = audioDemoSlice.actions;
 
 export const selectAudioDemoDomain = state => state.audioDemo;
 
@@ -81,6 +95,13 @@ export const selectCurrentAction = createSelector(
   selectAudioDemoDomain,
   audioDemo => audioDemo.action
 );
+
+
+export const selectDemoSpotifyToken = createSelector(
+  selectAudioDemoDomain,
+  audioDemo => audioDemo.spotify.token
+);
+
 
 export const selectDemoShapes = createSelector(
     selectAudioDemoDomain,
