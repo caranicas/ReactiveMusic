@@ -15,6 +15,8 @@ import { Sphere } from '../../primatives/Sphere';
 import CustomCamera from './CustomCamera';
 import EditControls from './controls/editControls';
 import InfoControls from './controls/infoControls';
+import SpotifyPlayer from 'react-spotify-web-playback';
+
 
 import styles from './audioDemo.module.css';
 
@@ -57,8 +59,6 @@ function SphereList (props) {
 //     projector.unprojectVector( worldPos, camera );
 //     return worldPos;                    
 // }
-
-
 
 export default function AudioDemo () {
 
@@ -147,7 +147,7 @@ export default function AudioDemo () {
         [dispatch, action]
     );
 
-    //         <BoxList boxes={boxes} ></BoxList>
+    const spotifyToken = 'BQC8KuRwAV1OgfSgi5U_qMGbk2QToBkvKxaXlnqzGOZCOUtDyErhxw9t0cSVekFI5GLDHzS5R1eHRt0Z7zkm-ND11hCgUQ4saRxtb0kKshDhIGVAJD6GMovjO0fLH9xXZEGbS-WSL6Fong';
     return (
         <>
             <div className={styles.canvasContainer}>
@@ -161,6 +161,11 @@ export default function AudioDemo () {
             </div>
             <EditControls></EditControls>
             <InfoControls></InfoControls>
+
+            <SpotifyPlayer
+                token='BQDf6PpCxHu-jtPPzrMjmp0vbQrfrDjBF6TUZvJI8N0QMZ79XMTtPAvpRxBJcIasacQlk-GnrjsuC0nJ0EqDMEYjw4BrbsEjh-A8JQRFdH64fa6BPZU-2ijbbI_G_YjuQfrm_E0IaZ-gqag2wkJi5YyFiRLelskj27eb3aYxCFr6ttTL9M2FJY4WYA'
+                uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
+            />
         </>
     );
 };
