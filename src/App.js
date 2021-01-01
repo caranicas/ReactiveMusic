@@ -52,11 +52,8 @@ function App() {
         url += `&scope=${encodeURIComponent(scopes.join(' '))}`;
 
         window.location = url;
-        console.log('doLogin',url);
-       // dispatch({});
     },
     []
-    //[dispatch]
 );
 
   return (
@@ -70,7 +67,9 @@ function App() {
                 <Switch>
 
                   <Route exact path="/">
-                    <Button  onClick={doLogin}>LOGIN</Button>
+
+                    <Link to='/login'>login</Link>
+                    {/* <Button  onClick={doLogin}>LOGIN</Button> */}
                   </Route>
 
                   <Route exact path="/editor">
@@ -83,9 +82,8 @@ function App() {
 
                   <Route path="/callback">
                     <CallbackPage />
-                    <Redirect to="/editor" />
+                    {/* <Redirect to="/editor" /> */}
                   </Route>
-
 
                 </Switch>
             </div>
