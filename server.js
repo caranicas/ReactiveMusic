@@ -1,3 +1,5 @@
+// @references https://github.com/zachwinter/kaleidosync/blob/046af60adff46013117a6bcabdc5cc8406b2ccce/server/index.js
+
 // import  express from 'express';
 // import path from 'path'
 // todo use imports
@@ -37,44 +39,19 @@ var generateRandomString = function(length) {
 app.use(express.static(path.join(__dirname, 'build')))   
     .use(cors())
     .use(cookieParser());
+    
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', '*')
+//     res.header('Access-Control-Allow-Methods', 'GET')
+//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+//     next()
+//   })
 
+// PAGE Routes
 // todo figure out how to get the routes to read from a single place
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-
-
-app.get('/login', function(req, res) {
-    const scopes = [
-        'streaming',
-        'user-library-modify',
-        'user-read-email',
-        'user-read-private',
-        'user-read-playback-position',
-        'user-read-playback-state',
-        'user-modify-playback-state',
-        'user-read-currently-playing',
-        'user-library-read'
-      ];
-
-    
-    var state = generateRandomString(16);
-
-
-
-
-    res.cookie(stateKey, state);
-    // your application requests authorization
-    var scope = 'user-read-private user-read-email';
-    res.redirect('https://accounts.spotify.com/authorize?' +
-      querystring.stringify({
-        response_type: 'code',
-        client_id: client_id,
-        scope: scopes.join(' '),
-        redirect_uri: redirect_uri,
-        state: state
-      }));
-  });
 
 app.get('/editor', function (req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
@@ -88,5 +65,35 @@ app.get('/callback', function (req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
+
+// "api"
+app.post('/login', function(req, res) {
+    
+    const scopes = [
+        'streaming',
+        'user-library-modify',
+        'user-read-email',
+        'user-read-private',
+        'user-read-playback-position',
+        'user-read-playback-state',
+        'user-modify-playback-state',
+        'user-read-currently-playing',
+        'user-library-read'
+      ];
+
+    var state = generateRandomString(16);
+
+    // res.cookie(stateKey, state);
+    // your application requests authorization
+    var scope = 'user-read-private user-read-email';
+    res.redirect('https://accounts.spotify.com/authorize?' +
+      querystring.stringify({
+        response_type: 'code',
+        client_id: client_id,
+        scope: scopes.join(' '),
+        redirect_uri: redirect_uri,
+        state: state
+      }));
+});
 
 app.listen(3000);

@@ -17,6 +17,7 @@ import EditControls from './controls/editControls';
 import InfoControls from './controls/infoControls';
 import SpotifyPlayer from 'react-spotify-web-playback';
 
+import Player from '../player/player';
 
 import styles from './audioDemo.module.css';
 
@@ -162,10 +163,11 @@ export default function AudioDemo () {
             <EditControls></EditControls>
             <InfoControls></InfoControls>
 
-            <SpotifyPlayer
+            <Player/>
+            {/* <SpotifyPlayer
                 token={spotifyToken}
                 uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
-            />
+            /> */}
         </>
     );
 };

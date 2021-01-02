@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useFrame, sphereBufferGeometry } from 'react-three-fiber'
 
 export function Sphere(props) {
-    // This reference will give us direct access to the mesh
+  // This reference will give us direct access to the mesh
   const mesh = useRef();
 
   // Set up state for the hovered and active state
