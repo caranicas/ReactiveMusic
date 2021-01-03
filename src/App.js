@@ -68,8 +68,8 @@ function App() {
 
                   <Route exact path="/">
 
-                    <Link to='/login'>login</Link>
-                    {/* <Button  onClick={doLogin}>LOGIN</Button> */}
+                    {/* <Link to='/login'>login</Link> */}
+                    <Button  onClick={doLogin}>LOGIN</Button>
                   </Route>
 
                   <Route exact path="/editor">

@@ -67,7 +67,7 @@ app.get('/callback', function (req, res) {
 
 
 // "api"
-app.post('/login', function(req, res) {
+app.get('/login', function(req, res) {
     
     const scopes = [
         'streaming',
