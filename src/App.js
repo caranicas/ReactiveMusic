@@ -1,5 +1,5 @@
 import React, {useEffect, useCallback} from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import EditorPage from './routes/editor/EditorPage';
 import ViewPage from './routes/view/ViewPage';
@@ -14,25 +14,56 @@ import {
   Switch,
   Route,
   Link,
-  Redirect
+  Redirect,
+  useLocation
 } from "react-router-dom";
+
+import {
+  // actions
+  fetchAuthId,
+  asyncUserLogin,
+  // selectors
+  selectSpotifyLocalAuthed,
+  selectSpotifyLocalId,
+} from './features/spotify/spotifySlice';
 
 function App() {
 
+  const sucess = useSelector(selectSpotifyLocalAuthed);
+  const localId = useSelector(selectSpotifyLocalId);
+  // const location = useLocation();
   const dispatch = useDispatch();
+
+  // this fires on init, leaving for
+  // the time being
   useEffect(() => {
-      console.log('APP INIT USE EFFECTS')
-  },[])
+      console.log('APP INIST USE EFFECTS', process.env.REACT_APP_PROJECT_ROOT);
+  },[]);
+
+  // when the local id changes there is a new user
+  useEffect(() => {
+    if(localId) {
+        // console.log(
+        //   'location',location
+        // )
+     // dispatch(asyncUserLogin(localId));
+         window.location.href = `${process.env.REACT_APP_PROJECT_ROOT}/api/login?auth_id=${localId}` // eslint-disable-line
+    }
+  },[sucess, localId])
 
   const doLogin = useCallback(
     () => {
+        console.log('TRY TO FETCH');
+        dispatch(fetchAuthId());
+        console.log('POST FETCH WAITS?');
+
+      /*
         const client_id = process.env.REACT_APP_CLIENT_ID; // Your client id
         const redirect_uri = process.env.REACT_APP_REDIRECT_URI; // Your redirect uri
         console.log('redirect_uri', redirect_uri);
         const scopes = [
           'streaming',
           'user-library-modify',
-          // 'user-read-birthdate',
           'user-read-email',
           'user-read-private',
           'user-read-playback-position',
@@ -51,7 +82,8 @@ function App() {
         url += `&redirect_uri=${encodeURIComponent(redirect_uri)}`;
         url += `&scope=${encodeURIComponent(scopes.join(' '))}`;
 
-        window.location = url;
+        window.location.href = url;
+        */
     },
     []
 );
@@ -72,7 +104,7 @@ function App() {
                     <Button  onClick={doLogin}>LOGIN</Button>
                   </Route>
 
-                  <Route exact path="/editor">
+                  <Route path="/editor">
                     { EditorPage }
                   </Route>
 
