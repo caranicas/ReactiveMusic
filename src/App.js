@@ -41,51 +41,18 @@ function App() {
   },[]);
 
   // when the local id changes there is a new user
+  // todo figure out how to pass success as well....
   useEffect(() => {
     if(localId) {
-        // console.log(
-        //   'location',location
-        // )
-     // dispatch(asyncUserLogin(localId));
          window.location.href = `${process.env.REACT_APP_PROJECT_ROOT}/api/login?auth_id=${localId}` // eslint-disable-line
     }
   },[sucess, localId])
 
   const doLogin = useCallback(
     () => {
-        console.log('TRY TO FETCH');
         dispatch(fetchAuthId());
-        console.log('POST FETCH WAITS?');
-
-      /*
-        const client_id = process.env.REACT_APP_CLIENT_ID; // Your client id
-        const redirect_uri = process.env.REACT_APP_REDIRECT_URI; // Your redirect uri
-        console.log('redirect_uri', redirect_uri);
-        const scopes = [
-          'streaming',
-          'user-library-modify',
-          'user-read-email',
-          'user-read-private',
-          'user-read-playback-position',
-          'user-read-playback-state',
-          'user-modify-playback-state',
-          'user-read-currently-playing',
-          'user-library-read'
-        ];
-
-
-      //  ["streaming", "user-read-birthdate", "user-read-email", "user-read-private"]
-       // `http://localhost:3000/calllback/`; // Your redirect uri
-  
-        let url = 'https://accounts.spotify.com/authorize?response_type=token';
-        url += `&client_id=${encodeURIComponent(client_id)}`;
-        url += `&redirect_uri=${encodeURIComponent(redirect_uri)}`;
-        url += `&scope=${encodeURIComponent(scopes.join(' '))}`;
-
-        window.location.href = url;
-        */
     },
-    []
+    [dispatch]
 );
 
   return (
@@ -112,10 +79,9 @@ function App() {
                     <ViewPage />
                   </Route>
 
-                  <Route path="/callback">
+                  {/* <Route path="/callback">
                     <CallbackPage />
-                    {/* <Redirect to="/editor" /> */}
-                  </Route>
+                  </Route> */}
 
                 </Switch>
             </div>

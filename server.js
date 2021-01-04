@@ -40,11 +40,11 @@ app.get('/', function (req, res) {
 
 app.get('/editor/', function (req, res) {
   console.log("EDITOR ROUTE")
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.get('/view', function (req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 
