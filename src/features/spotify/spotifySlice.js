@@ -36,9 +36,8 @@ export const SpotifySlice = createSlice({
     authId:null,
     
     // spotify server values
-    token: null, 
-    type: null, 
-    expire: null,
+    access: null, 
+    refresh: null,
 
     // offically finally logged in
     loggedIn:false,
@@ -46,10 +45,9 @@ export const SpotifySlice = createSlice({
 
   reducers: {
     setTokenInfo: (state, action) => {
-    const{payload: {token, type, expire}} = action;
-      state.spotify = {
-        token, type, expire
-      };
+    const{payload: {access, refresh}} = action;
+      state.access = access;
+      state.refresh = refresh;
     },
   },
   extraReducers: {
@@ -92,7 +90,12 @@ export const selectSpotifyLocalAuthed = createSelector(
 
 export const selectSpotifyAccessToken = createSelector(
     selectSpotifyDomain,
-    spotify => spotify.token
+    spotify => spotify.access
+);
+
+export const selectSpotifyRefreshToken = createSelector(
+  selectSpotifyDomain,
+  spotify => spotify.refresh
 );
 
 export default SpotifySlice.reducer;

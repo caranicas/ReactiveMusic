@@ -69,16 +69,16 @@ export const audioDemoSlice = createSlice({
       state.shapes.push(record);
     },
 
-    setSpofityTokenInfo: (state, action) => {
-      console.log(
-        'spotify info', action
-      )
-      const{payload: {token, type, expire}} = action
+    // setSpofityTokenInfo: (state, action) => {
+    //   console.log(
+    //     'spotify info', action
+    //   )
+    //   const{payload: {token, type, expire}} = action
 
-      state.spotify = {
-        token, type, expire
-      }
-    }
+    //   state.spotify = {
+    //     token, type, expire
+    //   }
+    // }
   },
 });
 

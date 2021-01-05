@@ -66,13 +66,12 @@ function App() {
                 <Switch>
 
                   <Route exact path="/">
-
                     {/* <Link to='/login'>login</Link> */}
                     <Button  onClick={doLogin}>LOGIN</Button>
                   </Route>
 
                   <Route path="/editor">
-                    { EditorPage }
+                    < EditorPage />
                   </Route>
 
                   <Route exact path="/view">
