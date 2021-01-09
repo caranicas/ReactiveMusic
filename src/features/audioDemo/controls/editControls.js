@@ -10,6 +10,11 @@ import {
    selectActiveShapeId,  selectCurrentAction
 } from '../audioDemoSlice';
 
+import {
+    getSpotifySearchResults
+} from '../../spotify/spotifySlice';
+
+
 export default function EditControls () {
 
     const dispatch = useDispatch();
@@ -40,6 +45,14 @@ export default function EditControls () {
         [dispatch]
     );
 
+    const searchTest = useCallback(
+        () => {
+            console.log('callback dispatch getSpotifySearchResults ')
+            return dispatch(getSpotifySearchResults('foobar'));
+        },
+        [dispatch]
+    );
+
     const handleEditAction = (event, newAction) => {
         dispatch(setEditAction(newAction))
     };
@@ -51,6 +64,8 @@ export default function EditControls () {
                 <ToggleButton value={MAKE_SQUARE} onDoubleClick={createBox}>Add Cube</ToggleButton> 
                 <ToggleButton value={MAKE_CIRCLE} onDoubleClick={createSphere} color="primary">Add sphere</ToggleButton> 
             </ToggleButtonGroup>
+
+            <Button onClick={searchTest}>SEARCH TEST</Button>
         </div>
     );
 }

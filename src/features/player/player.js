@@ -127,12 +127,14 @@ export default function Player() {
     if(tokenAccess) {
         console.log('RENDER PLAYER PRIME')
         return (
+            <>
             <SpotifyPlayer
                 callback={playerCallbackHandle}
                 name='Music Vis'
                 token={tokenAccess}
                 uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
             />
+            </>
         );
     }
     else {

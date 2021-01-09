@@ -7,7 +7,6 @@ import axios from 'axios';
 export const fetchAuthId = createAsyncThunk(
     'spotify/fetchAuthId',
     async () => {
-        console.log('fetchAuthId TOP')
         const { data } = await axios.get('/api/auth') // eslint-disable-line
         //const response = await userAPI.fetchById(userId)
         return data;
@@ -17,12 +16,44 @@ export const fetchAuthId = createAsyncThunk(
 export const asyncUserLogin = createAsyncThunk(
     'spotify/asyncUserLogin',
     async () => {
-        console.log('fetchAuthId TOP')
         const { data } = await axios.get('/api/auth') // eslint-disable-line
         //const response = await userAPI.fetchById(userId)
         return data;
     }
 );
+
+
+
+// JUST A POC TEST
+export const getSpotifySearchResults = createAsyncThunk(
+  'spotify/searchResults',
+  async (args, { getState }) => {
+    const token = selectSpotifyAccessToken(getState());
+    console.log(
+      'getSpotifySearchResults token', token
+    );
+    const config = {
+      method: 'get',
+
+      url: 'https://api.spotify.com/v1/search?q=artist:guster&type=artist',
+      //'https://api.spotify.com/v1/search?q=album:gold%20artist:abba&type=album',
+     
+      //'https://api.spotify.com/v1/search?q=roadhouse%20blues',
+      // 'https://api.spotify.com/v1/search?q=name:guster&type=artist',
+      headers: { 'Authorization': `Bearer ${token}` },
+    };
+
+    console.log('config', config)
+    // json: true
+    
+    const { data } =  await axios(config);
+    return data;
+  }
+);
+
+
+
+//https://api.spotify.com/v1/search
 
 export const SpotifySlice = createSlice({
   name: 'spotify',
@@ -41,6 +72,7 @@ export const SpotifySlice = createSlice({
 
     // offically finally logged in
     loggedIn:false,
+    search:null
   },
 
   reducers: {
@@ -70,6 +102,11 @@ export const SpotifySlice = createSlice({
     [asyncUserLogin.fulfilled]: (state, action) => {
         state.loggingIn = true;
     },
+
+    [getSpotifySearchResults.fulfilled]: (state, action) => {
+      console.log('search fufilled', action);
+      state.search =true;
+    }
 
   }
 });
