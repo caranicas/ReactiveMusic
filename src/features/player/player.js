@@ -5,18 +5,21 @@ import Script from 'react-load-script';
 import {
     useAnimationFrame
 } from '../../app/customHooks/animationFrame';
-
+import SpotifyPlayer from 'react-spotify-web-playback';
 import {
     selectSpotifyAccessToken,
     selectSpotifyRefreshToken
 } from '../spotify/spotifySlice';
 
-
-
 import {
+    // actions
     setSDKReady,
+    setPlayerConnected,
+    setPlayerPause,
+
+    //selector
     selectPlayerReady,
-    setPlayerInit,
+
 } from './playerSlice';
 
 export default function Player() {
@@ -26,41 +29,38 @@ export default function Player() {
     const playerReady = useSelector(selectPlayerReady);
 
     // on first load
-    useEffect(()=> {
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            console.log('onSpotifyWebPlaybackSDKReady')
-            dispatch(setSDKReady());
-        };
-    },[]);
+    // useEffect(()=> {
+    //     window.onSpotifyWebPlaybackSDKReady = () => {
+    //         dispatch(setSDKReady());
+    //     };
+    // },[]);
 
 
-    const playerListeners = () => {
-        console.log('SET LISTENERS')
-        window.$player.addListener('player_state_changed', async (o) => {
-            console.log('player_state_changed', o)
-        });
-    }
-
+    // const playerListeners = () => {
+    //     // window.$player.addListener('player_state_changed', async (o) => {
+    //     //     console.log('player_state_changed', o)
+    //     // });
+    // };
 
     // create the player with our token
-    useEffect(()=> {
-        async function createPlayer() {
-            window.$player = new window.Spotify.Player({
-                name: 'Music Vis',
-                getOAuthToken: cb => { cb(tokenAccess) }
-            });
+    // useEffect(()=> {
+    //     async function createPlayer() {
+    //         // window.$player = new window.Spotify.Player({
+    //         //     name: 'Music Vis',
+    //         //     getOAuthToken: cb => { cb(tokenAccess) }
+    //         // });
 
-            playerListeners();
-            await window.$player.connect();
-            dispatch(setPlayerInit());
-            return {};
-            //return resolve();
-        }
-        if(playerReady) {
-            createPlayer();
-        }
+    //         playerListeners();
+    //         // await window.$player.connect();
+    //         // dispatch(setPlayerConnected());
+    //         // return {};
+    //         //return resolve();
+    //     }
+    //     if(playerReady) {
+    //         createPlayer();
+    //     }
 
-    },[tokenAccess, playerReady]);
+    // },[tokenAccess, playerReady]);
 
     // useAnimationFrame(deltaTime => {
     //     async function checkState() {
@@ -78,16 +78,19 @@ export default function Player() {
     //     }
 
 
-    //     if (!window.$player) return;
+    //     if (!playerReady) return;
 
     //     checkState();
-      
 
-     
+
+
     //    // debugger;
     //     //console.log('USE ANIMATION FRAME');
     // });
 
+
+
+    // @TODO what do i want to do with these? 
     const createPlayerScript = useCallback(
         () => {
             console.log('createPlayerScript')
@@ -110,17 +113,52 @@ export default function Player() {
         [dispatch]
     );
 
-
-
-    return (
-        <div>
-            PLAYER
-            <Script
-                url="https://sdk.scdn.co/spotify-player.js"
-                onCreate={createPlayerScript}
-                onLoad={loadPlayerScript}
-                onError={errorPlayerScript}
-            />
-        </div>
+    const playerCallbackHandle = useCallback(
+        (state) => {
+            console.log('playerCallbackHandle', state);
+        },
+        [dispatch]
     );
+
+
+    console.log('tokenAccess', tokenAccess)
+
+
+    if(tokenAccess) {
+        console.log('RENDER PLAYER PRIME')
+        return (
+            <SpotifyPlayer
+                callback={playerCallbackHandle}
+                name='Music Vis'
+                token={tokenAccess}
+                uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
+            />
+        );
+    }
+    else {
+        return (
+            <div>
+                PLAYER LOADING {tokenAccess}
+            </div>
+        );
+    }
+    //}
+    // return (
+    //     <div>
+    //         PLAYER
+    //         {/* <Script
+    //             url="https://sdk.scdn.co/spotify-player.js"
+    //             onCreate={createPlayerScript}
+    //             onLoad={loadPlayerScript}
+    //             onError={errorPlayerScript}
+    //         /> */}
+
+    //         <SpotifyPlayer
+    //             callback={playerCallbackHandle}
+    //             name='Music Vis'
+    //             token={tokenAccess}
+    //             uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
+    //         />
+    //     </div>
+    // );
 }

@@ -6,7 +6,8 @@ export const playerSlice = createSlice({
   initialState: {
     loading:false,
     ready:false,
-    initialized:false
+    appConnect:false,
+    paused:false,
   },
   reducers: {
     setCreateScript: state => {
@@ -17,14 +18,24 @@ export const playerSlice = createSlice({
         state.ready = true
     },
 
-    setPlayerInit: (state, action) => {
-        state.initialized = true
+    setPlayerConnected: (state, action) => {
+      console.log("setPlayerConnected")
+      state.appConnect = true
     },
-    
+
+    setPlayerPause: (state, action) => {
+      state.paused = true
+    },
   },
 });
 
-export const { setCreateScript, setSDKReady, setPlayerInit } = playerSlice.actions;
+export const {
+  setCreateScript,
+  setSDKReady,
+  setPlayerInit,
+  setPlayerConnected,
+  setPlayerPause
+} = playerSlice.actions;
 
 
 export const selectPlayerDomain = state => state.player;
@@ -39,14 +50,21 @@ export const selectPlayerReady = createSelector(
   player => player.ready
 );
 
-
-
-export const selectPlayerInitialized = createSelector(
+export const selectPlayerIsConnected = createSelector(
   selectPlayerDomain,
-  player => player.initialized
+  player => player.appConnect
 );
 
+export const selectPlayerWaitingToConnect = createSelector(
+  selectPlayerReady,
+  selectPlayerIsConnected,
+  (ready, isConn) => ready && !isConn
+);
 
+export const selectPlayerIsPaused = createSelector(
+  selectPlayerDomain,
+  player => player.paused
+);
 
 
 

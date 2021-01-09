@@ -59,6 +59,7 @@ function App() {
       <Router>
         <div id="layout">
             <div id="header">
+              <Link to='/'>home</Link>
               <Link to='/editor'>Editor</Link>
               <Link to='/view'>View</Link>
             </div>
@@ -73,6 +74,10 @@ function App() {
                   <Route path="/editor">
                     < EditorPage />
                   </Route>
+
+                  {/* <Route path="/editor/catch">
+                    < EditorPage />
+                  </Route> */}
 
                   <Route exact path="/view">
                     <ViewPage />

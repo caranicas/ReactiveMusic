@@ -28,6 +28,10 @@ import {
     selectDemoSpotifyToken
 } from './audioDemoSlice';
 
+import {
+    selectSpotifyAccessToken,
+} from '../spotify/spotifySlice';
+
 function BoxList (props) {
     const { boxes } = props;
 
@@ -71,7 +75,7 @@ export default function AudioDemo () {
     const boxes = useSelector(selectCubes);
     const spheres = useSelector(selectSpheres);
     const action = useSelector(selectCurrentAction);
-    const spotifyToken = useSelector(selectDemoSpotifyToken);
+    const spotifyToken = useSelector(selectSpotifyAccessToken);
 
 
     const cameraRef = useRef();
