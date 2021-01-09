@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   useLocation
@@ -13,18 +14,26 @@ import {
 
 export default function EditorPage () {
 
-        const dispatch = useDispatch();
 
-        // there should be an better way to do this...?
+  const dispatch = useDispatch();
+  const { search } =  useLocation();// || {search:''};
+
+
+  useEffect(()=> {
+            // there should be an better way to do this...?
         // todo use a useMemo?
         const tokenAccessSplit = '?access_token=';
         const tokenRefreshSplit = '&refresh_token=';
-        const { search } =  useLocation();// || {search:''};
+ 
         const access = search?.split(tokenAccessSplit)[1]?.split(tokenRefreshSplit)[0];
         const refresh = search?.split(tokenRefreshSplit)[1];
     
         dispatch(setTokenInfo({access, refresh}));
     
+  },[]);
+
+
+
 
     return (
       <div className={styles.page}>
@@ -32,4 +41,3 @@ export default function EditorPage () {
       </div>
     );
 }
-  

@@ -27,6 +27,7 @@
   },
   "scripts": {
     "local-node-server": "node server.js",
+    "kill-local": "taskkill /f /im node.exe",
     "watch": "cra-build-watch",
     "start": "react-scripts start",
     "build": "react-scripts build",

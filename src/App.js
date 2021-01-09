@@ -46,7 +46,7 @@ function App() {
     if(localId) {
          window.location.href = `${process.env.REACT_APP_PROJECT_ROOT}/api/login?auth_id=${localId}` // eslint-disable-line
     }
-  },[sucess, localId])
+  },[0, localId])
 
   const doLogin = useCallback(
     () => {
