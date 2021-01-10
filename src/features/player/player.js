@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Script from 'react-load-script';
 
 import {
-    useAnimationFrame
+    // useAnimationFrame,
+    reUseAnimationFrame
 } from '../../app/customHooks/animationFrame';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import {
@@ -13,12 +14,18 @@ import {
 
 import {
     // actions
-    setSDKReady,
-    setPlayerConnected,
-    setPlayerPause,
+    setInit,
+    setPlayerReady,
+    // setPlayerConnected,
+    // setPlayerIsPlaying,
+    setPlayerUpdateReady,
+    setPlayerTrackUpdate,
+    setPlayerTime,
 
     //selector
     selectPlayerReady,
+    selectPlayerIsActive,
+    selectPlayerIsPlaying
 
 } from './playerSlice';
 
@@ -26,141 +33,82 @@ export default function Player() {
     const dispatch = useDispatch();
     const tokenAccess = useSelector(selectSpotifyAccessToken);
     const tokenRefresh = useSelector(selectSpotifyRefreshToken);
-    const playerReady = useSelector(selectPlayerReady);
-
-    // on first load
-    // useEffect(()=> {
-    //     window.onSpotifyWebPlaybackSDKReady = () => {
-    //         dispatch(setSDKReady());
-    //     };
-    // },[]);
+    const playerPlaying = useSelector(selectPlayerIsPlaying);
+    const playerRef = useRef();
 
 
-    // const playerListeners = () => {
-    //     // window.$player.addListener('player_state_changed', async (o) => {
-    //     //     console.log('player_state_changed', o)
-    //     // });
-    // };
-
-    // create the player with our token
-    // useEffect(()=> {
-    //     async function createPlayer() {
-    //         // window.$player = new window.Spotify.Player({
-    //         //     name: 'Music Vis',
-    //         //     getOAuthToken: cb => { cb(tokenAccess) }
-    //         // });
-
-    //         playerListeners();
-    //         // await window.$player.connect();
-    //         // dispatch(setPlayerConnected());
-    //         // return {};
-    //         //return resolve();
-    //     }
-    //     if(playerReady) {
-    //         createPlayer();
-    //     }
-
-    // },[tokenAccess, playerReady]);
-
-    // useAnimationFrame(deltaTime => {
-    //     async function checkState() {
-    //         //const _state = window.$player.getCurrentState();
-    //         const _state = await window.$player.getCurrentState();
-    //         if (!_state) {
-    //             // console.log('no state return')
-    //             return;
-    //         } 
-
-    //         console.log(
-    //             '_state', _state
-    //         );
-    //         debugger;
-    //     }
-
-
-    //     if (!playerReady) return;
-
-    //     checkState();
-
-
-
-    //    // debugger;
-    //     //console.log('USE ANIMATION FRAME');
-    // });
-
-
-
-    // @TODO what do i want to do with these? 
-    const createPlayerScript = useCallback(
-        () => {
-            console.log('createPlayerScript')
-            //return dispatch(setShapeIndexActive(0));
-        },
-        [dispatch]
-    );
-    const loadPlayerScript = useCallback(
-        () => {
-            console.log('loadPlayerScript')
-            //return dispatch(setShapeIndexActive(0));
-        },
-        [dispatch]
-    );
-    const errorPlayerScript = useCallback(
-        () => {
-            console.log('errorPlayerScript')
-            // return dispatch(setShapeIndexActive(0));
-        },
-        [dispatch]
-    );
+    reUseAnimationFrame( (deltaTime) => {
+        if (!playerPlaying) return;
+        // create an async function to await inside of
+        // https://medium.com/javascript-in-plain-english/how-to-use-async-function-in-react-hook-useeffect-typescript-js-6204a788a435
+        // @TODO turn into IIFE
+        async function checkState() {
+            const state = await playerRef.current.player.getCurrentState();
+            console.log('_state', state);
+            const { position, timestamp } = state;
+            dispatch(setPlayerTime({position, timestamp}));
+        };
+        checkState();
+    },[playerPlaying]);
 
     const playerCallbackHandle = useCallback(
         (state) => {
-            console.log('playerCallbackHandle', state);
+            const { type, status } = state;
+            if(type == 'status_update') {
+
+                if(status === "INITIALIZING") {
+                    dispatch(setInit());
+                }
+
+                else if(status === "READY") {
+                    const { devices, currentDeviceId } = state;
+                    dispatch(setPlayerReady({devices, currentDeviceId}))
+                }
+
+                else {
+                    console.log('STATUS', status);
+                    alert(
+                        'NEW STATUS'
+                    )
+                }
+            }
+            else if (type == 'player_update') {
+                const { isActive, isPlaying, track } = state;
+                if(status === "READY") {
+                    dispatch(setPlayerUpdateReady({isActive, isPlaying, track}));
+                }
+
+                else {
+                    console.log('STATUS', status);
+                    alert(
+                        'NEW STATUS'
+                    )
+                }
+            }
+            else if (type == 'track_update') {
+                const { nextTracks, previousTracks } = state;
+                if(status === "READY") {
+                    dispatch(setPlayerTrackUpdate({nextTracks, previousTracks}));
+                }
+            }
+            else {
+                console.log('TYPE', type);
+                alert(
+                    'NEW TYPE'
+                )
+            }
         },
         [dispatch]
     );
 
-
-    console.log('tokenAccess', tokenAccess)
-
-
-    if(tokenAccess) {
-        console.log('RENDER PLAYER PRIME')
-        return (
-            <>
-            <SpotifyPlayer
-                callback={playerCallbackHandle}
-                name='Music Vis'
-                token={tokenAccess}
-                uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
-            />
-            </>
-        );
-    }
-    else {
-        return (
-            <div>
-                PLAYER LOADING {tokenAccess}
-            </div>
-        );
-    }
-    //}
-    // return (
-    //     <div>
-    //         PLAYER
-    //         {/* <Script
-    //             url="https://sdk.scdn.co/spotify-player.js"
-    //             onCreate={createPlayerScript}
-    //             onLoad={loadPlayerScript}
-    //             onError={errorPlayerScript}
-    //         /> */}
-
-    //         <SpotifyPlayer
-    //             callback={playerCallbackHandle}
-    //             name='Music Vis'
-    //             token={tokenAccess}
-    //             uris={['spotify:artist:6HQYnRM4OzToCYPpVBInuU']}
-    //         />
-    //     </div>
-    // );
+    return (
+        <SpotifyPlayer
+            ref={playerRef}
+            callback={playerCallbackHandle}
+            name='Music Vis'
+            token={tokenAccess}
+            syncExternalDevice
+            uris={['spotify:artist:34XlPCFfB4vT7P1ekWq9Jc']}
+        />
+    );
 }

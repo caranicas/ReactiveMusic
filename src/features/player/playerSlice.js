@@ -6,37 +6,77 @@ export const playerSlice = createSlice({
   initialState: {
     loading:false,
     ready:false,
-    appConnect:false,
-    paused:false,
+    // appConnect:false,
+    isActive:false,
+    playing:false,
+
+    // todo move to spotify slice?
+    id:null,
+    devices:[],
+    track: {},
+    previousTracks:[],
+    nextTracks:[]
+
   },
+
   reducers: {
-    setCreateScript: state => {
+    setInit: state => {
       state.loading = true;
     },
 
-    setSDKReady: (state, action) => {
-        state.ready = true
+    setPlayerReady: (state, action) => {
+       const { payload : {devices, currentDeviceId } } = action;
+        state.ready = true;
+        state.id = currentDeviceId;
+        state.devices = devices;
     },
 
-    setPlayerConnected: (state, action) => {
-      console.log("setPlayerConnected")
-      state.appConnect = true
+
+    setPlayerUpdateReady: (state, action) => {
+        const { payload: { isActive, isPlaying, track }} = action;
+        state.isActive = isActive;
+        state.playing = isPlaying;
+        state.track = track;
+        // @TODO set duration ?
     },
 
-    setPlayerPause: (state, action) => {
-      state.paused = true
+    setPlayerTime: (state, action) => {
+      const { payload: { position, timestamp }} = action;
+      if(timestamp > state.timestamp) {
+        console.log('time is linear');
+        state.timestamp = timestamp;
+        state.position = position;
+      }
+
     },
+
+    setPlayerTrackUpdate: (state, action) => {
+      const { payload: { previousTracks, nextTracks }} = action;
+        state.previousTracks = previousTracks;
+        state.nextTracks = nextTracks;
+        // @TODO clear out position and timestamp?
+    },
+
+
+    // setPlayerConnected: (state, action) => {
+    //   state.appConnect = true
+    // },
+
+    // setPlayerIsPlaying: (state, action) => {
+    //   state.playing = true
+    // },
   },
 });
 
 export const {
-  setCreateScript,
-  setSDKReady,
-  setPlayerInit,
-  setPlayerConnected,
-  setPlayerPause
+  setInit,
+  setPlayerReady,
+  // setPlayerConnected,
+  // setPlayerIsPlaying,
+  setPlayerUpdateReady,
+  setPlayerTime,
+  setPlayerTrackUpdate
 } = playerSlice.actions;
-
 
 export const selectPlayerDomain = state => state.player;
 
@@ -50,6 +90,12 @@ export const selectPlayerReady = createSelector(
   player => player.ready
 );
 
+
+export const selectPlayerIsActive = createSelector(
+  selectPlayerDomain,
+  player => player.isActive
+);
+
 export const selectPlayerIsConnected = createSelector(
   selectPlayerDomain,
   player => player.appConnect
@@ -61,11 +107,9 @@ export const selectPlayerWaitingToConnect = createSelector(
   (ready, isConn) => ready && !isConn
 );
 
-export const selectPlayerIsPaused = createSelector(
+export const selectPlayerIsPlaying = createSelector(
   selectPlayerDomain,
-  player => player.paused
+  player => player.playing
 );
-
-
 
 export default playerSlice.reducer;

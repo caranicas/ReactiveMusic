@@ -21,8 +21,9 @@ import {
 import {
   // actions
   fetchAuthId,
-  asyncUserLogin,
+  
   // selectors
+  selectSpotifyAccessToken,
   selectSpotifyLocalAuthed,
   selectSpotifyLocalId,
 } from './features/spotify/spotifySlice';
@@ -30,8 +31,8 @@ import {
 function App() {
 
   const sucess = useSelector(selectSpotifyLocalAuthed);
+  const tokenAccess = useSelector(selectSpotifyAccessToken);
   const localId = useSelector(selectSpotifyLocalId);
-  // const location = useLocation();
   const dispatch = useDispatch();
 
   // this fires on init, leaving for
@@ -67,12 +68,12 @@ function App() {
                 <Switch>
 
                   <Route exact path="/">
-                    {/* <Link to='/login'>login</Link> */}
                     <Button  onClick={doLogin}>LOGIN</Button>
                   </Route>
 
                   <Route path="/editor">
-                    < EditorPage />
+                     {/* if we have a token go to the editor page, otherwise go back to home page*/}
+                     {tokenAccess != null ? < EditorPage /> :  <Redirect to="/" />}
                   </Route>
 
                   <Route exact path="/view">
@@ -80,6 +81,7 @@ function App() {
                   </Route>
 
                   <Route path="/token">
+                    {/* use the token page to grab the data and then redirect to the editor*/}
                     <TokenPage />
                     <Redirect to="/editor" />
                   </Route>

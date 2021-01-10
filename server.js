@@ -20,7 +20,6 @@ var client_secret = '6a43fd0d4976468a9b7e5892cd25903d'; // Your secret
 var redirect_uri = 'http://localhost:3000/callback/'; // Your redirect uri
 
 
-
 app.use(express.static(path.join(__dirname, 'build')))
     .use(cors())
     .use(cookieParser());

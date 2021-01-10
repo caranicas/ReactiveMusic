@@ -8,7 +8,6 @@ export const fetchAuthId = createAsyncThunk(
     'spotify/fetchAuthId',
     async () => {
         const { data } = await axios.get('/api/auth') // eslint-disable-line
-        //const response = await userAPI.fetchById(userId)
         return data;
     }
 );
@@ -17,7 +16,6 @@ export const asyncUserLogin = createAsyncThunk(
     'spotify/asyncUserLogin',
     async () => {
         const { data } = await axios.get('/api/auth') // eslint-disable-line
-        //const response = await userAPI.fetchById(userId)
         return data;
     }
 );
@@ -34,10 +32,6 @@ export const getSpotifySearchResults = createAsyncThunk(
       method: 'get',
 
       url: 'https://api.spotify.com/v1/search?q=artist:guster&type=artist',
-      //'https://api.spotify.com/v1/search?q=album:gold%20artist:abba&type=album',
-     
-      //'https://api.spotify.com/v1/search?q=roadhouse%20blues',
-      // 'https://api.spotify.com/v1/search?q=name:guster&type=artist',
       headers: { 'Authorization': `Bearer ${token}` },
     };
 
@@ -48,7 +42,6 @@ export const getSpotifySearchResults = createAsyncThunk(
     return data;
   }
 );
-
 
 
 //https://api.spotify.com/v1/search
@@ -102,7 +95,6 @@ export const SpotifySlice = createSlice({
     },
 
     [getSpotifySearchResults.fulfilled]: (state, action) => {
-      console.log('search fufilled', action);
       state.search =true;
     }
 

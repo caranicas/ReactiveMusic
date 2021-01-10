@@ -5,7 +5,6 @@ p {
 
 
 /*MAIN PAGE */
-
 #layout {
   min-height: 100vh;
   display: flex;
@@ -34,7 +33,6 @@ p {
   width: 100%;
   flex-basis: 50px;
 }
-
 
 .overlay {
   position: absolute;
