@@ -42,24 +42,23 @@ function ConnectStatus() {
 export default function EditorPage () {
 
 
-  const dispatch = useDispatch();
-  const { search } =  useLocation();// || {search:''};
+  // const dispatch = useDispatch();
+  // const { search } =  useLocation();// || {search:''};
 
-  // const playerReady = useSelector(selectPlayerReady);
-
+  // // const playerReady = useSelector(selectPlayerReady);
  
-  useEffect(()=> {
-        // there should be an better way to do this...?
-        // todo use a useMemo?
-        const tokenAccessSplit = '?access_token=';
-        const tokenRefreshSplit = '&refresh_token=';
+  // useEffect(()=> {
+  //       // there should be an better way to do this...?
+  //       // todo use a useMemo?
+  //       const tokenAccessSplit = '?access_token=';
+  //       const tokenRefreshSplit = '&refresh_token=';
  
-        const access = search?.split(tokenAccessSplit)[1]?.split(tokenRefreshSplit)[0];
-        const refresh = search?.split(tokenRefreshSplit)[1];
+  //       const access = search?.split(tokenAccessSplit)[1]?.split(tokenRefreshSplit)[0];
+  //       const refresh = search?.split(tokenRefreshSplit)[1];
     
-        dispatch(setTokenInfo({access, refresh}));
+  //       dispatch(setTokenInfo({access, refresh}));
     
-  },[]);
+  // },[]);
 
     return (
       <div className={styles.page}>

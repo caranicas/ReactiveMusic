@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import EditorPage from './routes/editor/EditorPage';
 import ViewPage from './routes/view/ViewPage';
 
-import CallbackPage from './routes/auth/CallbackPage';
+import TokenPage from './routes/auth/TokenPage';
 
 import { Button } from '@material-ui/core';
 import './App.css';
@@ -75,18 +75,14 @@ function App() {
                     < EditorPage />
                   </Route>
 
-                  {/* <Route path="/editor/catch">
-                    < EditorPage />
-                  </Route> */}
-
                   <Route exact path="/view">
                     <ViewPage />
                   </Route>
 
-                  {/* <Route path="/callback">
-                    <CallbackPage />
-                  </Route> */}
-
+                  <Route path="/token">
+                    <TokenPage />
+                    <Redirect to="/editor" />
+                  </Route>
                 </Switch>
             </div>
 

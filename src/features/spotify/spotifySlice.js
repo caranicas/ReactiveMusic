@@ -22,8 +22,6 @@ export const asyncUserLogin = createAsyncThunk(
     }
 );
 
-
-
 // JUST A POC TEST
 export const getSpotifySearchResults = createAsyncThunk(
   'spotify/searchResults',
