@@ -178,6 +178,11 @@ export const selectSpotifyRefreshToken = createSelector(
 //   //tatums
 // },
 
+
+const infoIndex = (time) => (info) => {
+  return time > info?.start && time < info?.start + info?.duration
+};
+
 export const selectAllBarInfo = createSelector(
   selectSpotifyDomain,
   spotify =>{
@@ -185,9 +190,21 @@ export const selectAllBarInfo = createSelector(
   }
 );
 
-const infoIndex = (time) => (info) => {
-  return time > info?.start && time < info?.start + info?.duration
-};
+// @ TODO to super functional
+// export const selectAnalysisInfoForTimeStamp = (type, time)
+export const selectBarInfoForTimeStamp = (time) => createSelector(
+  selectAllBarInfo,
+  (bars) => {
+    // quick out
+    if(!bars) return [];
+    const index = bars.findIndex(infoIndex(time));
+    // current bar
+    let info = [bars[index]];
+    // conditional next bar
+    (bars.length > (index+1)) && info.push(bars[index+1]);
+    return info;
+  }
+);
 
 
 export const selectCurrentBarInfo = createSelector(
@@ -235,30 +252,6 @@ export const selectCurrentBarProgress = createSelector(
 );
 
 
-// const elapsed = this.state.trackProgress - start
-// this.state.activeIntervals[type].elapsed = elapsed
-// this.state.activeIntervals[type].progress = ease(elapsed / duration)
-
-  
-// @ TODO to super functional
-// export const selectAnalysisInfoForTimeStamp = (type, time)
-export const selectBarInfoForTimeStamp = (time) => createSelector(
-  selectAllBarInfo,
-  (bars) => {
-    // quick out
-    if(!bars) return [];
-    const index = bars.findIndex(infoIndex(time));
-    // current bar
-    let info = [bars[index]];
-    // conditional next bar
-    (bars.length > (index+1)) && info.push(bars[index+1]);
-    return info;
-  }
-);
-
-
-
-
 const selectAllBeatInfo = createSelector(
   selectSpotifyDomain,
   spotify => spotify.trackAnalysis?.beats
@@ -278,10 +271,55 @@ export const selectBeatInfoForTimeStamp = (time) => createSelector(
   }
 );
 
+export const selectCurrentBeatInfo = createSelector(
+  selectPlayerAudioPositionMS,
+  selectAllBeatInfo,
+  (position, beats) => {
+    // quick out
+    if(!beats) return {};
+    const index = beats.findIndex(infoIndex(position));
+    // current bar
+    //let info = [beats[index]];
+    // conditional next bar
+    // (beats.length > (index+1)) && info.push(beats[index+1]);
+    return beats[index];//info[0];
+  }
+);
+
+
+export const selectCurrentBeatElapsed = createSelector(
+  selectCurrentBeatInfo,
+  selectPlayerAudioPositionMS,
+  (beat, curTime) => {
+    const { start } = beat || {};
+    if(!start) {
+      return 1;
+    }
+    const elapsed  = curTime - start;
+    return elapsed;
+  }
+);
+
+
+export const selectCurrentBeatProgress = createSelector(
+  selectCurrentBeatInfo,
+  selectCurrentBeatElapsed,
+  (beat, elapsed) => {
+    const { duration } = beat || {};
+    if(!duration) {
+      return 1;
+    }
+    // ease?
+    const progress = elapsed / duration;
+    return progress;
+  }
+);
+
 const selectAllSectionInfo = createSelector(
   selectSpotifyDomain,
   spotify => spotify.trackAnalysis?.sections
 );
+
 export const selectSectionInfoForTimeStamp = (time) => createSelector(
   selectAllSectionInfo,
   (sections) => {
@@ -333,6 +371,48 @@ export const selectTatumInfoForTimeStamp = (time) => createSelector(
     return info;
   }
 );
+
+
+export const selectCurrentTatumInfo = createSelector(
+  selectPlayerAudioPositionMS,
+  selectAllTatumInfo,
+  (position, tatum) => {
+    // quick out
+    if(!tatum) return {};
+    const index = tatum.findIndex(infoIndex(position));
+    return tatum[index];//info[0];
+  }
+);
+
+
+export const selectCurrentTatumElapsed = createSelector(
+  selectCurrentTatumInfo,
+  selectPlayerAudioPositionMS,
+  (tatum, curTime) => {
+    const { start } = tatum || {};
+    if(!start) {
+      return 1;
+    }
+    const elapsed  = curTime - start;
+    return elapsed;
+  }
+);
+
+
+export const selectCurrentTatumProgress = createSelector(
+  selectCurrentTatumInfo,
+  selectCurrentTatumElapsed,
+  (tatum, elapsed) => {
+    const { duration } = tatum || {};
+    if(!duration) {
+      return 1;
+    }
+    // ease?
+    const progress = elapsed / duration;
+    return progress;
+  }
+);
+  
 
 // @TODO combine all the above with the get timestamp selector
 // export const selectCurrentAnalysis = createSelector(

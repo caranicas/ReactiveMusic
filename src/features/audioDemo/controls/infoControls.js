@@ -14,8 +14,7 @@ export default function InfoControls () {
     const shape = useSelector(makeSelectShapeByIndexSelector(Id))
 
     const { type, id, position} = shape || {position:[]};
-    console.log('infor controls shape', shape)
-
+ 
     return (
         <span style={{color:'rgb(180,180,180'}}>
            <p>Inspceting:{type} {id}</p>

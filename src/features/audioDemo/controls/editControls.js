@@ -26,7 +26,6 @@ export default function EditControls () {
 
     const bar = useSelector(selectBarInfoForTimeStamp('0.6'));
 
-    console.log('BarINFO', bar);
 
     const updateSelectedIndex = useCallback(
         () => {

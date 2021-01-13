@@ -17,7 +17,7 @@ export function Box(props) {
   const mesh = useRef();
 
   // @TODO set for each dimention, and for each shape
-  const baseScale = 2;
+  const baseScale = 1;
   const fullScale =  [(baseScale*reactive),(baseScale*reactive),(baseScale*reactive)];
 
   // if()

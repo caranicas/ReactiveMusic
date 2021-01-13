@@ -30,11 +30,12 @@ import {
 import {
     selectSpotifyAccessToken,
     selectCurrentBarProgress,
+    selectCurrentBeatElapsed,
+    selectCurrentTatumProgress
 } from '../spotify/spotifySlice';
 
 function BoxList (props) {
     const { boxes, progess } = props;
-    console.log('box list, progess', progess)
     return boxes.map((box) => {
         //console.log('box', box);
         return (
@@ -46,11 +47,12 @@ function BoxList (props) {
 
 
 function SphereList (props) {
-    const { spheres } = props;
+    const { spheres, progess } = props;
+    console.log('spheres list, progess', progess)
     return spheres.map((sphere) => {
         //console.log('sphere', sphere);
         return (
-            <Sphere key={sphere.id} position={sphere.position} />
+            <Sphere key={sphere.id} position={sphere.position} reactive={progess} />
         );
         /**            <dreiBox></dreiBox> */
     })
@@ -76,6 +78,7 @@ export default function AudioDemo () {
     const spheres = useSelector(selectSpheres);
     const action = useSelector(selectCurrentAction);
     const barProgress = useSelector(selectCurrentBarProgress);
+    const beatProgress = useSelector(selectCurrentBeatElapsed);
     const cameraRef = useRef();
     const raycaster = new Raycaster();
     const clickCanvas = useCallback(
@@ -159,7 +162,7 @@ export default function AudioDemo () {
                     <ambientLight />
                     <pointLight position={[10, 10, 10]} />
                     <BoxList boxes={boxes} progess={barProgress}></BoxList>
-                    <SphereList spheres={spheres} ></SphereList>
+                    <SphereList spheres={spheres} progess={beatProgress}></SphereList>
                 </Canvas>
             </div>
             <EditControls></EditControls>
