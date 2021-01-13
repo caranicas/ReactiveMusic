@@ -12,4 +12,7 @@ export default configureStore({
     player: playerReducer,
     spotify: spotifyReducer,
   },
+  middleware:(getDefaultMiddleware) => [...getDefaultMiddleware({serializableCheck: false, immutableCheck: false})]
 });
+
+//(getDefaultMiddleware) => [...getDefaultMiddleware({immutableCheck: false})]

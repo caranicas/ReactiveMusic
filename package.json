@@ -23,7 +23,9 @@
     "react-scripts": "4.0.1",
     "react-spotify-web-playback": "^0.8.1",
     "react-three-fiber": "^5.3.10",
-    "three": "^0.124.0"
+    "three": "^0.124.0",
+    "use-animation-frame": "^0.1.0",
+    "use-interpolation": "^0.2.0"
   },
   "scripts": {
     "local-node-server": "node server.js",

@@ -11,8 +11,16 @@ export function dreiBox() {
 };
 
 export function Box(props) {
-    // This reference will give us direct access to the mesh
+  // This reference will give us direct access to the mesh
+  const { reactive } = props;
+
   const mesh = useRef();
+
+  // @TODO set for each dimention, and for each shape
+  const baseScale = 2;
+  const fullScale =  [(baseScale*reactive),(baseScale*reactive),(baseScale*reactive)];
+
+  // if()
 
   // Set up state for the hovered and active state
   const [hovered, setHover] = useState(false);
@@ -27,7 +35,7 @@ export function Box(props) {
     <mesh
       {...props}
       ref={mesh}
-      scale={active ? [1.5, 1.5, 1.5] : [1, 1, 1]}
+      scale={fullScale}
       onClick={(event) => setActive(!active)}
       onPointerOver={(event) => setHover(true)}
       onPointerOut={(event) => setHover(false)}>

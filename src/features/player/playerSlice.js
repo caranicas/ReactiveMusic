@@ -14,8 +14,11 @@ export const playerSlice = createSlice({
     id:null,
     devices:[],
     track: {},
+    uris:['spotify:track:14j4diRlUSWvbq5t0rgR6b'],
     previousTracks:[],
-    nextTracks:[]
+    nextTracks:[],
+    position:0,
+    timestamp:0,
 
   },
 
@@ -31,7 +34,6 @@ export const playerSlice = createSlice({
         state.devices = devices;
     },
 
-
     setPlayerUpdateReady: (state, action) => {
         const { payload: { isActive, isPlaying, track }} = action;
         state.isActive = isActive;
@@ -42,9 +44,11 @@ export const playerSlice = createSlice({
 
     setPlayerTime: (state, action) => {
       const { payload: { position, timestamp }} = action;
+      // @TODO handle this else case?
+      // @TODO test the else caseconsole
       if(timestamp > state.timestamp) {
-        console.log('time is linear');
         state.timestamp = timestamp;
+        // convert to millisectrions
         state.position = position;
       }
 
@@ -110,6 +114,19 @@ export const selectPlayerWaitingToConnect = createSelector(
 export const selectPlayerIsPlaying = createSelector(
   selectPlayerDomain,
   player => player.playing
+);
+
+
+export const selectPlayerAudioPositionMS = createSelector(
+  selectPlayerDomain,
+  player => player.position/1000
+  
+)
+
+
+export const selectPlayerURIs = createSelector(
+  selectPlayerDomain,
+  player => player.uris
 );
 
 export default playerSlice.reducer;

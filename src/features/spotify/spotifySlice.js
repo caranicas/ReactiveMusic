@@ -1,7 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createSelector } from 'reselect';
 import axios from 'axios';
+import { ease } from '../../app/util/easing'
 
+import {
+  selectPlayerAudioPositionMS
+} from '../player/playerSlice';
 
 // First, create the thunk
 export const fetchAuthId = createAsyncThunk(
@@ -43,8 +47,26 @@ export const getSpotifySearchResults = createAsyncThunk(
   }
 );
 
+export const getSpotifyAudioResults = createAsyncThunk(
+  'spotify/audioResults',
+  async (args, { getState }) => {
+    const token = selectSpotifyAccessToken(getState());
+    console.log(
+      'getSpotifySearchResults token', token
+    );
+    const config = {
+      method: 'get',
+      url: 'https://api.spotify.com/v1/audio-analysis/14j4diRlUSWvbq5t0rgR6b',
+      headers: { 'Authorization': `Bearer ${token}` },
+    };
 
-//https://api.spotify.com/v1/search
+    console.log('audioResults config', config)
+    // json: true
+    
+    const { data } =  await axios(config);
+    return data;
+  }
+);
 
 export const SpotifySlice = createSlice({
   name: 'spotify',
@@ -63,7 +85,17 @@ export const SpotifySlice = createSlice({
 
     // offically finally logged in
     loggedIn:false,
-    search:null
+    search:null,
+    isLoadingAnalysis:false,
+    trackAnalysis:{
+      //meta
+      //track
+      //bar
+      //beats
+      //sections
+      //segments
+      //tatums
+    },
   },
 
   reducers: {
@@ -73,8 +105,8 @@ export const SpotifySlice = createSlice({
       state.refresh = refresh;
     },
   },
-  extraReducers: {
 
+  extraReducers: {
     // Add reducers for additional action types here, and handle loading state as needed
     [fetchAuthId.pending]: (state, action) => {
         state.loggingIn = true;
@@ -85,7 +117,7 @@ export const SpotifySlice = createSlice({
         const { payload: { auth_id, success }} = action;
         state.localAuthed = success;
         state.authId = auth_id;
-    }, 
+    },
 
     [asyncUserLogin.pending]: (state, action) => {
     },
@@ -96,6 +128,16 @@ export const SpotifySlice = createSlice({
 
     [getSpotifySearchResults.fulfilled]: (state, action) => {
       state.search =true;
+    },
+
+    [getSpotifyAudioResults.pending]: (state, action) =>{
+      state.isLoadingAnalysis = true;
+    },
+
+    [getSpotifyAudioResults.fulfilled]: (state, action) => {
+      const { payload } = action;
+      state.isLoadingAnalysis = false;
+      state.trackAnalysis = payload;
     }
 
   }
@@ -124,5 +166,176 @@ export const selectSpotifyRefreshToken = createSelector(
   selectSpotifyDomain,
   spotify => spotify.refresh
 );
+
+
+// trackAnalysis:{
+//   //meta
+//   //track
+//   //bar
+//   //beats
+//   //sections
+//   //segments
+//   //tatums
+// },
+
+export const selectAllBarInfo = createSelector(
+  selectSpotifyDomain,
+  spotify =>{
+    return spotify.trackAnalysis?.bars;
+  }
+);
+
+const infoIndex = (time) => (info) => {
+  return time > info?.start && time < info?.start + info?.duration
+};
+
+
+export const selectCurrentBarInfo = createSelector(
+  selectPlayerAudioPositionMS,
+  selectAllBarInfo,
+  (position, bars) => {
+    // quick out
+    if(!bars) return {};
+    const index = bars.findIndex(infoIndex(position));
+    // current bar
+    //let info = [bars[index]];
+    // conditional next bar
+    // (bars.length > (index+1)) && info.push(bars[index+1]);
+    return bars[index];//info[0];
+  }
+);
+
+
+export const selectCurrentBarElapsed = createSelector(
+  selectCurrentBarInfo,
+  selectPlayerAudioPositionMS,
+  (bar, curTime) => {
+    const { start } = bar || {};
+    if(!start) {
+      return 1;
+    }
+    const elapsed  = curTime - start;
+    return elapsed;
+  }
+);
+
+
+export const selectCurrentBarProgress = createSelector(
+  selectCurrentBarInfo,
+  selectCurrentBarElapsed,
+  (bar, elapsed) => {
+    const { duration } = bar || {};
+    if(!duration) {
+      return 1;
+    }
+    // ease?
+    const progress = elapsed / duration;
+    return progress;
+  }
+);
+
+
+// const elapsed = this.state.trackProgress - start
+// this.state.activeIntervals[type].elapsed = elapsed
+// this.state.activeIntervals[type].progress = ease(elapsed / duration)
+
+  
+// @ TODO to super functional
+// export const selectAnalysisInfoForTimeStamp = (type, time)
+export const selectBarInfoForTimeStamp = (time) => createSelector(
+  selectAllBarInfo,
+  (bars) => {
+    // quick out
+    if(!bars) return [];
+    const index = bars.findIndex(infoIndex(time));
+    // current bar
+    let info = [bars[index]];
+    // conditional next bar
+    (bars.length > (index+1)) && info.push(bars[index+1]);
+    return info;
+  }
+);
+
+
+
+
+const selectAllBeatInfo = createSelector(
+  selectSpotifyDomain,
+  spotify => spotify.trackAnalysis?.beats
+);
+
+export const selectBeatInfoForTimeStamp = (time) => createSelector(
+  selectAllBeatInfo,
+  (beats) => {
+    // quick out
+    if(!beats) return [];
+    const index = beats.findIndex(infoIndex(time));
+    // current beat
+    let info = [beats[index]];
+    // conditional next beat
+    (beats.length > (index+1)) && info.push(beats[index+1]);
+    return info;
+  }
+);
+
+const selectAllSectionInfo = createSelector(
+  selectSpotifyDomain,
+  spotify => spotify.trackAnalysis?.sections
+);
+export const selectSectionInfoForTimeStamp = (time) => createSelector(
+  selectAllSectionInfo,
+  (sections) => {
+    // quick out
+    if(!sections) return [];
+    const index = sections.findIndex(infoIndex(time));
+    // current section
+    let info = [sections[index]];
+    // conditional next section
+    (sections.length > (index+1)) && info.push(sections[index+1]);
+    return info;
+  }
+);
+
+const selectAllSegmentInfo = createSelector(
+  selectSpotifyDomain,
+  spotify => spotify.trackAnalysis?.segments
+);
+
+export const selectSegmentInfoForTimeStamp = (time) => createSelector(
+  selectAllSegmentInfo,
+  (segments) => {
+    // quick out
+    if(!segments) return [];
+    const index = segments.findIndex(infoIndex(time));
+    // current segment
+    let info = [segments[index]];
+    // conditional next segment
+    (segments.length > (index+1)) && info.push(segments[index+1]);
+    return info;
+  }
+);
+
+const selectAllTatumInfo = createSelector(
+  selectSpotifyDomain,
+  spotify => spotify.trackAnalysis?.tatums
+);
+
+export const selectTatumInfoForTimeStamp = (time) => createSelector(
+  selectAllTatumInfo,
+  (tatums) => {
+    // quick out
+    if(!tatums) return [];
+    const index = tatums.findIndex(infoIndex(time));
+    // current tatum
+    let info = [tatums[index]];
+    // conditional next tatum
+    (tatums.length > (index+1)) && info.push(tatums[index+1]);
+    return info;
+  }
+);
+
+// @TODO combine all the above with the get timestamp selector
+// export const selectCurrentAnalysis = createSelector(
+// );
 
 export default SpotifySlice.reducer;

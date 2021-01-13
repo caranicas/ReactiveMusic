@@ -11,7 +11,10 @@ import {
 } from '../audioDemoSlice';
 
 import {
-    getSpotifySearchResults
+    getSpotifySearchResults,
+    getSpotifyAudioResults,
+    // selectors
+    selectBarInfoForTimeStamp
 } from '../../spotify/spotifySlice';
 
 
@@ -21,6 +24,9 @@ export default function EditControls () {
     const buttonValue = useSelector(selectCurrentAction);
     const idValu = useSelector(selectActiveShapeId);
 
+    const bar = useSelector(selectBarInfoForTimeStamp('0.6'));
+
+    console.log('BarINFO', bar);
 
     const updateSelectedIndex = useCallback(
         () => {
@@ -48,7 +54,15 @@ export default function EditControls () {
     const searchTest = useCallback(
         () => {
             console.log('callback dispatch getSpotifySearchResults ')
-            return dispatch(getSpotifySearchResults('foobar'));
+            return dispatch(getSpotifySearchResults());
+        },
+        [dispatch]
+    );
+
+    const analizeTest = useCallback(
+        () => {
+            console.log('callback dispatch getSpotifySearchResults ')
+            return dispatch(getSpotifyAudioResults());
         },
         [dispatch]
     );
@@ -66,6 +80,7 @@ export default function EditControls () {
             </ToggleButtonGroup>
 
             <Button onClick={searchTest}>SEARCH TEST</Button>
+            <Button onClick={analizeTest}>ANALYSIS TEST</Button>
         </div>
     );
 }

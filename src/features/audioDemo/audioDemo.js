@@ -24,21 +24,21 @@ import styles from './audioDemo.module.css';
 import { 
     INSPECT, MAKE_SQUARE, MAKE_CIRCLE,
     addBoxToScene, addSphereToScene,
-    selectCubes, selectSpheres, selectCurrentAction, 
-    selectDemoSpotifyToken
+    selectCubes, selectSpheres, selectCurrentAction,
 } from './audioDemoSlice';
 
 import {
     selectSpotifyAccessToken,
+    selectCurrentBarProgress,
 } from '../spotify/spotifySlice';
 
 function BoxList (props) {
-    const { boxes } = props;
-
+    const { boxes, progess } = props;
+    console.log('box list, progess', progess)
     return boxes.map((box) => {
         //console.log('box', box);
         return (
-            <Box key={box.id} position={box.position} />
+            <Box key={box.id} position={box.position} reactive={progess}/>
         );
         /**            <dreiBox></dreiBox> */
     })
@@ -75,9 +75,7 @@ export default function AudioDemo () {
     const boxes = useSelector(selectCubes);
     const spheres = useSelector(selectSpheres);
     const action = useSelector(selectCurrentAction);
-    const spotifyToken = useSelector(selectSpotifyAccessToken);
-
-
+    const barProgress = useSelector(selectCurrentBarProgress);
     const cameraRef = useRef();
     const raycaster = new Raycaster();
     const clickCanvas = useCallback(
@@ -160,7 +158,7 @@ export default function AudioDemo () {
                     <CustomCamera ref={cameraRef} fov={30} position={[0, 0, camDepth]} />
                     <ambientLight />
                     <pointLight position={[10, 10, 10]} />
-                    <BoxList boxes={boxes} ></BoxList>
+                    <BoxList boxes={boxes} progess={barProgress}></BoxList>
                     <SphereList spheres={spheres} ></SphereList>
                 </Canvas>
             </div>
